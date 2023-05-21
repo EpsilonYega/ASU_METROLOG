@@ -19,6 +19,7 @@ class Controller():
         print(df)
 
     #методы манипуляции с информацией о пользователе
+    #get и set методы
     def get_address(self):
         if self._address is not None:
             return self._address
