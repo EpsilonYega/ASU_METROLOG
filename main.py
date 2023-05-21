@@ -1,7 +1,16 @@
 import pandas as pd
+
+from datetime import datetime
+from Client import Client
+from Address import Address
+from FIO import FIO
+
 class Controller():
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
+        self._address = None
+        self._verification_list = None
+        self._FIO = None
+        self._client = None
     #Метод/ы для загрузки данных
     def load_excel(self, path):
         #Для считывания файлов из excel используется библиотека pandas
@@ -10,19 +19,38 @@ class Controller():
         print(df)
 
     #методы манипуляции с информацией о пользователе
-    def insert_client_data(self, client):
-        #запрос к БД для вставки данных клиента
-        return
-    def update_client_data(self, client):
-        #запрос к БД для обновления данных клиента
+    def get_address(self):
+        if self._address is not None:
+            return self._address
+        return 'На данный момент адрес не указан'
+    def set_address(self, city, district, street, house_number, entrance_number, apartment_number, house_type,
+                    entrance_count):
+        self._address = Address(city, district, street, house_number, entrance_number, apartment_number, house_type, entrance_count)
+    def get_verification_list(self):
+        return self._verification_list
+    def set_verification_list(self, verification_list):
+        self._verification_list = verification_list
+    def get_FIO(self):
+        return self._FIO
+    def set_FIO(self, surname, name, patronymic):
+        self._FIO = FIO(surname, name, patronymic)
+    def insert_client_data(self, device_count, phone_number, servicing_company):
+        self.client = Client(self._address, self._verification_list, device_count, phone_number, self._FIO, servicing_company)
+    def update_client_data(self, client, address, verification_list, device_count, phone_number, full_name, servicing_company):
+        client.set_full_name(full_name)
+        client.set_phone_number(phone_number)
+        client.set_address(address)
+        client.set_device_count(device_count)
+        client.set_servicing_company(servicing_company)
+        client.set_verification_list(verification_list)
         return
     def delete_client_data(self):
-        #запрос к БД для удаления данных клиента
+        #запрос к модели для удаления данных клиента
         return
 
     #Методы вывода данных о клиенте на основе входящих параметров
     def output_data_by_address(self, address):
-        clientAddress = self.client.address.show_full_address()
+        clientAddress = self._address.show_full_address()
         if address in clientAddress:
             self.client.print_info()
         else:
@@ -33,7 +61,7 @@ class Controller():
         else:
             print('Совпадений по указанному номеру не нашлось.')
     def output_data_by_FIO(self, FIO):
-        clientName = self.client.get_full_name()
+        clientName = self._FIO.get_full_name()
         if FIO in clientName:
             self.client.print_info()
         else:
@@ -53,12 +81,10 @@ class Controller():
     def notification(self, day):
         return
 
-from datetime import datetime
-from Client import Client
-from Address import Address
 
-
-address1 = Address('Ростов-на-Дону', 'Ворошиловский', 'Мечникова', 79, 1, 203, 'Общежитие', '')
-list1 = [datetime.strptime('09/03/22 13:55:26', '%m/%d/%y %H:%M:%S'), datetime.strptime('05/10/23 14:16:21', '%m/%d/%y %H:%M:%S'),datetime.strptime('05/18/23 17:21:06', '%m/%d/%y %H:%M:%S')]
-client1 = Client(address1, list, 25, '+79891233424', 'Орлов Владислав Сергеевич', 'ТСЖ метеор')
-controller = Controller(client1)
+vlist = [datetime.strptime('09/03/22 13:55:26', '%m/%d/%y %H:%M:%S'), datetime.strptime('05/10/23 14:16:21', '%m/%d/%y %H:%M:%S'),datetime.strptime('05/18/23 17:21:06', '%m/%d/%y %H:%M:%S')]
+controller = Controller()
+controller.set_address('Ростов-на-Дону', 'Ворошиловский', 'Мечникова', 79, 1, 203, 'Общежитие', 1)
+controller.set_verification_list(vlist)
+controller.set_FIO('Орлов','Владислав','Сергеевич')
+controller.insert_client_data(25, '+79891233424', 'ТСЖ метеор')
